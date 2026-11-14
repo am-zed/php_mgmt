@@ -1,0 +1,10 @@
+# Step template: upgrade all installed php* packages to the latest available
+# in the enabled stream (sourced from the internal mirror), then restart
+# php-fpm to load the new binaries. Gated on `mirrorsReady`.
+steps:
+  - task: Bash@3
+    condition: and(succeeded(), eq(variables['mirrorsReady'], 'true'))
+    displayName: Upgrade installed PHP packages
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/update-php.sh

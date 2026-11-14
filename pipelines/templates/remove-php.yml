@@ -1,0 +1,15 @@
+parameters:
+  - name: modules
+    type: string
+    default: ""
+
+# Step template: remove specified PHP modules, or the entire PHP stack
+# (`modules=all`). Gated on `mirrorsReady`.
+steps:
+  - task: Bash@3
+    condition: and(succeeded(), eq(variables['mirrorsReady'], 'true'))
+    displayName: Remove PHP modules
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/remove-php.sh
+      arguments: "'${{ parameters.modules }}'"

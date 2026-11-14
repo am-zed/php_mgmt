@@ -1,0 +1,12 @@
+parameters:
+  - name: phpVersion
+    type: string
+
+steps:
+  - task: Bash@3
+    condition: and(succeeded(), eq(variables['mirrorsReady'], 'true'))
+    displayName: Set ${{ parameters.phpVersion }} as default PHP
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/switch-php-default.sh
+      arguments: "'${{ parameters.phpVersion }}'"

@@ -1,0 +1,13 @@
+parameters:
+  - name: modules
+    type: string
+    default: ""
+
+steps:
+  - task: Bash@3
+    condition: and(succeeded(), eq(variables['mirrorsReady'], 'true'))
+    displayName: Install PHP modules
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/manage-modules.sh
+      arguments: "'${{ parameters.modules }}'"

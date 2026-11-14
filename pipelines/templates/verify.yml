@@ -1,0 +1,12 @@
+parameters:
+  - name: phpVersion
+    type: string
+
+steps:
+  - task: Bash@3
+    condition: and(succeeded(), eq(variables['mirrorsReady'], 'true'))
+    displayName: Verify PHP ${{ parameters.phpVersion }} installation
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/tests/test-php-install.sh
+      arguments: "'${{ parameters.phpVersion }}'"

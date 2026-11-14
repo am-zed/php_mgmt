@@ -1,0 +1,71 @@
+parameters:
+  - name: mode
+    type: string
+  - name: phpVersion
+    type: string
+  - name: modules
+    type: string
+    default: ""
+  - name: targetVMs
+    type: string
+  - name: poolName
+    type: string
+  - name: setAsDefault
+    type: boolean
+    default: false
+  - name: outputFormat
+    type: string
+    default: table
+
+# Per-VM job template. Expands into one job per entry in the comma-separated
+# `targetVMs` list, pinned to a specific self-hosted agent via the
+# `Agent.Name` demand. A read-only mirror check runs first (in every action
+# mode) and sets `mirrorsReady`; each action step is gated on that variable,
+# so a VM whose internal mirrors are missing is warned and skipped rather than
+# modified.
+jobs:
+  - ${{ each vm in split(parameters.targetVMs, ",") }}:
+    - job: ManagePHP_${{ replace(replace(trim(vm), "-", "_"), ".", "_") }}
+      displayName: ${{ parameters.mode }} PHP ${{ parameters.phpVersion }} on ${{ trim(vm) }}
+      pool:
+        name: ${{ parameters.poolName }}
+        demands: Agent.Name -equals ${{ trim(vm) }}
+      steps:
+        - checkout: self
+
+        - ${{ if ne(parameters.mode, 'audit') }}:
+          - template: check-mirrors.yml
+
+        - ${{ if eq(parameters.mode, 'install') }}:
+          - template: install-php.yml
+            parameters:
+              phpVersion: ${{ parameters.phpVersion }}
+          - template: manage-modules.yml
+            parameters:
+              modules: ${{ parameters.modules }}
+          - ${{ if eq(parameters.setAsDefault, true) }}:
+            - template: switch-php-default.yml
+              parameters:
+                phpVersion: ${{ parameters.phpVersion }}
+          - template: verify.yml
+            parameters:
+              phpVersion: ${{ parameters.phpVersion }}
+
+        - ${{ if eq(parameters.mode, 'update') }}:
+          - template: update-php.yml
+          - template: audit-php.yml
+            parameters:
+              outputFormat: ${{ parameters.outputFormat }}
+
+        - ${{ if eq(parameters.mode, 'remove') }}:
+          - template: remove-php.yml
+            parameters:
+              modules: ${{ parameters.modules }}
+          - template: audit-php.yml
+            parameters:
+              outputFormat: ${{ parameters.outputFormat }}
+
+        - ${{ if eq(parameters.mode, 'audit') }}:
+          - template: audit-php.yml
+            parameters:
+              outputFormat: ${{ parameters.outputFormat }}

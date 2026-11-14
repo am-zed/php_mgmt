@@ -1,0 +1,3 @@
+# RHEL 9 specific PHP module overrides / additions.
+# Merged on top of config/rhel-common/modules.list (de-duplicated).
+# Leave empty to inherit the common defaults.

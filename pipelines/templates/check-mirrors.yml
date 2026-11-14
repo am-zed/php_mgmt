@@ -1,0 +1,9 @@
+# Step template: verify internal Remi & EPEL mirrors are configured and
+# enabled on the target VM (read-only). Sets the job variable `mirrorsReady`
+# (true/false) consumed by the install/update/remove step conditions.
+steps:
+  - task: Bash@3
+    displayName: Check internal mirror configuration
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/check-mirrors.sh

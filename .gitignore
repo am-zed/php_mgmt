@@ -1,0 +1,7 @@
+# Azure Pipelines / agent local artifacts
+*.log
+.azure/
+
+# Editor / OS
+.DS_Store
+*.swp

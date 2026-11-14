@@ -1,0 +1,15 @@
+parameters:
+  - name: outputFormat
+    type: string
+    default: table
+
+# Step template: read-only audit of the current PHP installation including
+# internal mirror status. Makes no changes; always runs (not gated on
+# `mirrorsReady`) so it reports state even when a host was skipped.
+steps:
+  - task: Bash@3
+    displayName: Audit PHP installation (read-only)
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/scripts/audit-php.sh
+      arguments: "'${{ parameters.outputFormat }}'"

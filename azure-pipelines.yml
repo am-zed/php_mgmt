@@ -1,0 +1,65 @@
+# Azure Pipelines - PHP version & module management on RHEL
+#
+# Manually-triggered pipeline that installs, updates, removes, or audits a
+# target PHP version and set of PHP modules on one or more self-hosted RHEL
+# 9/10 DevOps agents, and optionally sets the installed version as the system
+# default.
+#
+# Packages are sourced exclusively from INTERNAL mirrors that must already be
+# configured and enabled on each target VM (see "Internal mirrors" below). The
+# public Remi/EPEL repositories are never installed, enabled, or contacted.
+#
+# Trigger: manual only (no CI triggers).
+trigger: none
+
+parameters:
+  - name: mode
+    displayName: "Mode"
+    type: string
+    default: install
+    values: [install, update, remove, audit]
+
+  - name: phpVersion
+    displayName: "PHP Version (x.y or x.y.z)"
+    type: string
+    default: "8.3"
+
+  - name: modules
+    displayName: "Modules (comma-separated; added on install, removed on remove, 'all' to remove whole stack)"
+    type: string
+    default: ""
+
+  - name: targetVMs
+    displayName: "Target VMs (comma-separated VM names; required)"
+    type: string
+    default: ""
+
+  - name: poolName
+    displayName: "Agent Pool Name"
+    type: string
+    default: "rhel-pool"
+
+  - name: setAsDefault
+    displayName: "Set as default PHP version on target VMs (install mode)"
+    type: boolean
+    default: false
+
+  - name: outputFormat
+    displayName: "Audit output format"
+    type: string
+    default: table
+    values: [table, csv]
+
+stages:
+  - stage: ManagePHP
+    displayName: Manage PHP on RHEL VMs
+    jobs:
+      - template: pipelines/templates/php-mgmt-job.yml
+        parameters:
+          mode: ${{ parameters.mode }}
+          phpVersion: ${{ parameters.phpVersion }}
+          modules: ${{ parameters.modules }}
+          targetVMs: ${{ parameters.targetVMs }}
+          poolName: ${{ parameters.poolName }}
+          setAsDefault: ${{ parameters.setAsDefault }}
+          outputFormat: ${{ parameters.outputFormat }}
