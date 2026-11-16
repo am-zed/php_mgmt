@@ -12,6 +12,18 @@
 # Trigger: manual only (no CI triggers).
 trigger: none
 
+# Internal mirror baseurls, per RHEL major version. These are the
+# expected baseurls that must appear in an ENABLED repo in
+# /etc/yum.repos.d/*.repo on each target VM. The VMs must already have the
+# repos configured and enabled; these values are what the mirror-check step
+# verifies against. Replace the placeholders with the real internal mirror
+# baseurls.
+variables:
+  REMI9_MIRROR: https://mirror.internal.example.com/remi/9
+  EPEL9_MIRROR: https://mirror.internal.example.com/epel/9
+  REMI10_MIRROR: https://mirror.internal.example.com/remi/10
+  EPEL10_MIRROR: https://mirror.internal.example.com/epel/10
+
 parameters:
   - name: mode
     displayName: "Mode"

@@ -51,9 +51,12 @@ configured and enabled on each target VM. The public Remi/EPEL repositories are
 - Manual trigger only (`trigger: none`) [azure-pipelines.yml:13]
 - Packages sourced exclusively from internal mirrors (no public Remi/EPEL is
   installed or enabled) [scripts/mirror-check-lib.sh]
-- Mirror env vars are per-RHEL and must pre-exist on each VM:
-  `REMI9_MIRROR`/`EPEL9_MIRROR` (RHEL 9), `REMI10_MIRROR`/`EPEL10_MIRROR`
-  (RHEL 10) [scripts/mirror-check-lib.sh:run_mirror_check]
+- Mirror baseurls are defined as pipeline variables in `azure-pipelines.yml`
+  and passed into the mirror-check/audit Bash tasks via their `env:` block;
+  `mirror-check-lib.sh` reads them as `REMI9_MIRROR`/`EPEL9_MIRROR` (RHEL 9) or
+  `REMI10_MIRROR`/`EPEL10_MIRROR` (RHEL 10) based on the detected RHEL major
+  version. The matching repo must still already be configured and ENABLED in
+  `/etc/yum.repos.d/*.repo` on each target VM [scripts/mirror-check-lib.sh]
 - RHEL version is auto-detected via `rpm -E '%{rhel}'`; only 9 and 10 are
   supported [scripts/mirror-check-lib.sh:detect_rhel_ver]
 - Action steps (install/update/remove/switch/verify) are gated on

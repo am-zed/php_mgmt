@@ -9,6 +9,11 @@ parameters:
 steps:
   - task: Bash@3
     displayName: Audit PHP installation (read-only)
+    env:
+      REMI9_MIRROR: $(REMI9_MIRROR)
+      EPEL9_MIRROR: $(EPEL9_MIRROR)
+      REMI10_MIRROR: $(REMI10_MIRROR)
+      EPEL10_MIRROR: $(EPEL10_MIRROR)
     inputs:
       targetType: filePath
       filePath: $(Build.SourcesDirectory)/scripts/audit-php.sh
